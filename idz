@@ -1,0 +1,103 @@
+//11 idz
+#include <iostream>
+#include <chrono>
+#include<ctime>
+using namespace std;
+using namespace chrono;
+class List                              //Создаем тип данных Список
+{
+	int x, count;
+	List* head, * tail, * next, * prev;                 //Указатели на адреса начала списка и его конца
+public:
+	List() :head(0), tail(0) {};    //Инициализируем адреса как пустые       
+	~List();
+	void Show();                       //Прототип функции отображения списка на экране
+	void Add(int x);                   //Прототип функции добавления элементов в список
+};
+
+void List::Add(int x)
+{
+	List* temp = new List;               //Выделение памяти под новый элемент структуры
+	temp->next = 0;                   //Указываем, что изначально по следующему адресу пусто
+	temp->x = x;                         //Записываем значение в структуру
+	count += 1;
+	if (head != 0)                    //Если список не пуст
+	{
+		tail->next = temp;               //Указываем адрес следующего за хвостом элемента
+		temp->prev = tail;               //Указываем адрес на предыдущий элемент в соотв. поле
+		tail = temp;                     //Меняем адрес хвоста
+	}
+	else //Если список пустой
+	{
+		temp->prev = 0;               //Предыдущий элемент указывает в пустоту
+		head = tail = temp;              //Голова=Хвост=тот элемент, что сейчас добавили
+	}
+}
+
+void AddMass(int* mass, int& length) {
+	for (int i = 0; i < length; i++) {
+		mass[i] = (rand() % 100) + 1;
+	}
+}
+
+void List::Show()
+{
+	cout << "Список: ";
+	List* temp = new List;
+	temp = head;                       //Временно указываем на адрес первого элемента
+	while (temp != 0)              //Пока не встретим пустое значение
+	{
+		cout << temp->x << " ";        //Выводим каждое считанное значение на экран
+		temp = temp->next;             //Смена адреса на адрес следующего элемента
+	}
+	cout << "\n";
+}
+
+void ShowMass(int* mass, int& length) {
+	cout << "Массив: ";
+	for (int i = 0; i < length; i++) {
+		cout << mass[i] << " ";
+	}
+	cout << "\n";
+}
+
+List::~List()                           //Деструктор
+{
+	while (head)                       //Пока по адресу на начало списка что-то есть
+	{
+		tail = head->next;             //Резервная копия адреса следующего звена списка
+		delete head;                   //Очистка памяти от первого звена
+		head = tail;                   //Смена адреса начала на адрес следующего элемента
+	}
+}
+
+int main()
+{
+	srand(time(0));
+	setlocale(0, "");
+	auto start = chrono::steady_clock::now();
+	auto end = chrono::steady_clock::now();
+	int length = 0, minus = 0;
+	List lst;
+	cout << "Будут созданы список и массив с произвольными числами от 0 до 99."<< endl;
+	cout << "Введите их длину: " << endl;
+	cin >> length;
+	int* mass = new int[length];
+	for (int i = 0; i < length; i++)
+		lst.Add(rand() % 99);
+	AddMass(mass, length);
+	lst.Show();
+	ShowMass(mass, length);
+	system("pause");
+	cout << "Уничтожение массива и списка." << endl;
+	start = chrono::steady_clock::now();
+	lst.~List();
+	end = chrono::steady_clock::now();
+	cout << "Время уничтожения списка: " << chrono::duration_cast<chrono::nanoseconds>(end - start).count() << " наносекунд" << endl;
+
+	start = chrono::steady_clock::now();
+	delete[] mass;
+	end = chrono::steady_clock::now();
+	cout << "Время уничтожения массива: " << chrono::duration_cast<chrono::nanoseconds>(end - start).count() << " наносекунд" << endl;
+	system("pause");
+}
